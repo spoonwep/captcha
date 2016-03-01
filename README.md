@@ -6,7 +6,7 @@
     [
         {
             "type": "vcs",
-            "url": "https://github.com/khromov/ToroPHP"
+            "url": "https://github.com/spoonwep/captcha.git"
         }
     ],
     "require": {
