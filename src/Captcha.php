@@ -280,20 +280,18 @@ class Captcha
      */
     protected function generate()
     {
-        $characters = str_split($this->characters);
+	    session_start();
+	    unset($_SESSION['captcha']);
+	    $characters = str_split($this->characters);
 
-        $bag = '';
-        for($i = 0; $i < $this->length; $i++)
-        {
-            $bag .= $characters[rand(0, count($characters) - 1)];
-        }
+	    $bag = '';
+	    for($i = 0; $i < $this->length; $i++)
+	    {
+		    $bag .= $characters[rand(0, count($characters) - 1)];
+	    }
+	    $_SESSION['captcha'] = $this->hasher->make($this->sensitive ? $bag : $this->str->lower($bag));
 
-        $this->session->put('captcha', [
-            'sensitive' => $this->sensitive,
-            'key'       => $this->hasher->make($this->sensitive ? $bag : $this->str->lower($bag))
-        ]);
-
-        return $bag;
+	    return $bag;
     }
 
     /**
@@ -400,21 +398,15 @@ class Captcha
      */
     public function check($value)
     {
-        if ( ! $this->session->has('captcha'))
-        {
-            return false;
-        }
+	    session_start();
+	    if ( ! $_SESSION['captcha'])
+	    {
+		    return false;
+	    }
 
-        $key = $this->session->get('captcha.key');
+	    $key = $_SESSION['captcha'];
 
-        if ( ! $this->session->get('captcha.sensitive'))
-        {
-            $value = $this->str->lower($value);
-        }
-
-        $this->session->remove('captcha');
-
-        return $this->hasher->check($value, $key);
+	    return $this->hasher->check($value, $key);
     }
 
     /**
